@@ -1,0 +1,16 @@
+{
+  "name": "CodeInjector",
+  "version": "1.0.0",
+  "description": "Browser extension to inject custom scripts",
+  "scripts": {
+    "build": "web-ext build -s dist -i '**/*.css.map' --overwrite-dest",
+    "sass": "sass src:dest --update"
+  },
+  "devDependencies": {
+    "@types/firefox-webext-browser": "^94.0.1",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "eslint": "^8.28.0",
+    "typescript": "^4.9.3"
+  }
+}
