@@ -1,0 +1,55 @@
+@import "../base";
+table {
+  background: #181a1b;
+  border-top: 2px solid gray;
+  border-left: 2px solid gray;
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  th,
+  td {
+    border-bottom: 2px solid gray;
+    border-right: 2px solid gray;
+  }
+  th:nth-child(-n + 4) {
+    width: 4rem;
+  }
+  td:nth-child(-n + 4) {
+    text-align: center;
+  }
+  td:nth-child(2) {
+    text-align: left;
+  }
+}
+button {
+  background: black;
+  border-radius: 10%;
+  border: 2px solid gray;
+  color: darkgray;
+  font-size: 1rem;
+  height: 2rem;
+  margin: 3rem 0.5rem;
+}
+textarea {
+  background: black;
+  color: darkgray;
+  border: 1px solid #484848;
+  width: 99%;
+}
+select {
+  background: black;
+  color: darkgray;
+  border: 1px solid #484848;
+  border-radius: 1%;
+}
+.bubble {
+  background: darkgray;
+  color: black;
+  border-radius: 50%;
+  cursor: help;
+  border-left: 7px solid darkgray;
+  border-right: 8px solid darkgray;
+}
+.layout {
+  display: flex;
+}
