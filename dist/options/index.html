@@ -24,12 +24,12 @@
           <th>Size</th>
           <th>Script</th>
         </tr>
-        <tr>
+        <tr id="clone">
           <td>
             <button type="button" id="submit">Add</button>
           </td>
           <td>
-            <select id="key">
+            <select id="key" autocomplete="off">
               <option value="A">A</option>
               <option value="B">B</option>
               <option value="C">C</option>
@@ -81,16 +81,16 @@
             </select>
           </td>
           <td id="mods">
-            <div><input type="checkbox" />Shift</div>
-            <div><input type="checkbox" />Ctrl</div>
-            <div><input type="checkbox" />Alt</div>
+            <div><input type="checkbox" autocomplete="off" />Shift</div>
+            <div><input type="checkbox" autocomplete="off" />Ctrl</div>
+            <div><input type="checkbox" autocomplete="off" />Alt</div>
           </td>
           <td>
-            <input id="sync" type="checkbox" />
+            <input id="sync" type="checkbox" autocomplete="off" />
           </td>
           <td>-</td>
           <td>
-            <textarea id="code" cols="40" rows="5" placeholder="Type code here"></textarea>
+            <textarea id="code" cols="40" rows="5" placeholder="Type code here" autocomplete="off"></textarea>
           </td>
         </tr>
       </thead>
