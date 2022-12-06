@@ -31,11 +31,14 @@ const replace = (tr: HTMLElement, id: string) => {
       return;
     }
     LIST[LIST.findIndex((val) => val === parent.id)] = info.id;
-    parent.id = info.id;
     browser.storage.local.set({ list: LIST }).then(() => {
       const data = new Map();
       data.set(info.id, info.code);
       browser.storage.local.set(Object.fromEntries(data));
+      if (parent.id !== info.id) {
+        browser.storage.local.remove(parent.id);
+        parent.id = info.id;
+      }
     });
   };
   tr.children[0].append(save);
