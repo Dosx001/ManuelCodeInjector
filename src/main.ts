@@ -1,15 +1,17 @@
-const fix = (code: string) => {
-  if (code.search("Key") + code.search("Digit") === -1) {
-    return code.charAt(code.length - 1);
-  }
-  return code;
-};
-
 document.addEventListener("keydown", (ev) => {
+  let sum = 0;
+  if (ev.shiftKey) {
+    sum += 1;
+  }
+  if (ev.ctrlKey) {
+    sum += 2;
+  }
+  if (ev.altKey) {
+    sum += 4;
+  }
+  const code = ev.code;
   browser.runtime.sendMessage({
-    key: fix(ev.code),
-    ctrl: ev.ctrlKey,
-    alt: ev.altKey,
-    shift: ev.shiftKey,
+    key: `${code.search("Key") + code.search("Digit") === -1 ? code.at(-1) : code
+      }${sum}`,
   });
 });
