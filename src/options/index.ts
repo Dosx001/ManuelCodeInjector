@@ -1,20 +1,60 @@
 const TBODY = document.querySelector("tbody")!;
 const CLONE = document.getElementById("clone")!;
 let LIST: string[];
+
+const getInfo = (ele: HTMLElement) => {
+  const key = ele.querySelector<HTMLSelectElement>("#key")!.value;
+  return {
+    id: `${key}${Array.from(
+      ele.querySelector("#mods")!.querySelectorAll<HTMLInputElement>("input")
+    )
+      .map((ele) => Number(ele.checked))
+      .reduce((sum, cur, i) =>
+        cur ? (i === 2 ? sum + 4 : sum + i + 1) : sum
+      )}`,
+    key: key,
+    sync: ele.querySelector<HTMLInputElement>("#sync")!.checked,
+    code: ele.querySelector<HTMLTextAreaElement>("#code")!.value,
+  };
+};
+
 const replace = (tr: HTMLElement, id: string) => {
   tr.children[0].innerHTML = "";
   const save = document.createElement("button");
   save.innerText = "Save";
   save.style.marginBottom = ".5rem";
+  save.onclick = (ev) => {
+    const parent = (ev.target as HTMLElement).parentElement!.parentElement!;
+    const info = getInfo(parent);
+    if (parent.id !== info.id && document.getElementById(info.id)) {
+      alert("Hotkey are ready exists!");
+      return;
+    }
+    LIST[LIST.findIndex((val) => val === parent.id)] = info.id;
+    parent.id = info.id;
+    browser.storage.local.set({ list: LIST }).then(() => {
+      const data = new Map();
+      data.set(info.id, info.code);
+      browser.storage.local.set(Object.fromEntries(data));
+    });
+  };
   tr.children[0].append(save);
   const del = document.createElement("button");
+  del.onclick = (ev) => {
+    const parent = (ev.target as HTMLElement).parentElement!.parentElement!;
+    parent.remove();
+    LIST = LIST.filter((val) => val !== parent.id);
+    browser.storage.local.set({ list: LIST }).then(() => {
+      browser.storage.local.remove(id);
+    });
+  };
   del.innerText = "Delete";
   tr.children[0].append(del);
   tr.id = id;
 };
 
 browser.storage.local.get("list").then((res) => {
-  LIST = Object.values(res)[0] ?? [];
+  LIST = res.list ?? [];
   LIST.forEach((id) => {
     const tr = CLONE.cloneNode(true) as HTMLElement;
     tr.querySelector<HTMLSelectElement>("#key")!.value = id.substring(
@@ -42,6 +82,9 @@ browser.storage.local.get("list").then((res) => {
       case "4":
         opts = [2];
         break;
+      case "5":
+        opts = [0, 2];
+        break;
       case "6":
         opts = [1, 2];
         break;
@@ -58,32 +101,21 @@ browser.storage.local.get("list").then((res) => {
 });
 
 document.getElementById("submit")!.onclick = () => {
-  const key = document.querySelector<HTMLSelectElement>("#key")!.value;
-  const mods = Array.from(
-    document.getElementById("mods")!.querySelectorAll<HTMLInputElement>("input")
-  ).map((ele) => ele.checked);
-  let id: number | string = 0;
-  for (let i = 0; i < 3; i++) {
-    if (mods[i]) {
-      id += i + 1;
-    }
-  }
-  id = `${key}${id}`;
-  if (document.getElementById(id)) {
+  const info = getInfo(document.body);
+  if (document.getElementById(info.id)) {
     alert("Hotkey are ready exists!");
     return;
   }
-  const sync = document.querySelector<HTMLInputElement>("#sync")!.checked;
-  const code = document.querySelector<HTMLTextAreaElement>("#code")!.value;
   const tr = CLONE.cloneNode(true) as HTMLElement;
-  replace(tr, id);
+  replace(tr, info.id);
+  tr.querySelector<HTMLSelectElement>("#key")!.value = info.key;
   TBODY.append(tr);
-  LIST.push(id);
-  sync
+  LIST.push(info.id);
+  info.sync
     ? browser.storage.sync.set({ list: LIST })
     : browser.storage.local.set({ list: LIST }).then(() => {
       const data = new Map();
-      data.set(id, code);
+      data.set(info.id, info.code);
       browser.storage.local.set(Object.fromEntries(data));
     });
 };
