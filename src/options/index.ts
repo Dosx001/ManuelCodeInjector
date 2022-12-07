@@ -1,6 +1,7 @@
 const TBODY = document.querySelector("tbody")!;
 const CLONE = document.getElementById("clone")!;
-let LIST: string[];
+let LOCAL: string[];
+let SYNC: string[];
 
 const getInfo = (ele: HTMLElement) => {
   const key = ele.querySelector<HTMLSelectElement>("#key")!.value;
@@ -24,53 +25,133 @@ const replace = (tr: HTMLElement, id: string) => {
   save.innerText = "Save";
   save.style.marginBottom = ".5rem";
   save.onclick = (ev) => {
+    (
+      ev.target as HTMLElement
+    ).parentElement!.parentElement!.querySelector<HTMLInputElement>(
+      "#sync"
+    )!.disabled = false;
     const parent = (ev.target as HTMLElement).parentElement!.parentElement!;
     const info = getInfo(parent);
     if (parent.id !== info.id && document.getElementById(info.id)) {
       alert("Hotkey are ready exists!");
       return;
     }
-    LIST[LIST.findIndex((val) => val === parent.id)] = info.id;
-    browser.storage.local.set({ list: LIST }).then(() => {
-      const data = new Map();
-      data.set(info.id, info.code);
-      browser.storage.local.set(Object.fromEntries(data));
-      if (parent.id !== info.id) {
-        browser.storage.local.remove(parent.id);
-        parent.id = info.id;
-      }
-    });
+    const data = new Map();
+    data.set(info.id, info.code);
+    if (info.sync) {
+      SYNC[SYNC.findIndex((val) => val === parent.id)] = info.id;
+      browser.storage.sync.set({ sync: SYNC }).then(() => {
+        browser.storage.sync.set(Object.fromEntries(data));
+        if (parent.id !== info.id) {
+          browser.storage.sync.remove(parent.id);
+          parent.id = info.id;
+        }
+      });
+    } else {
+      LOCAL[LOCAL.findIndex((val) => val === parent.id)] = info.id;
+      browser.storage.local.set({ local: LOCAL }).then(() => {
+        browser.storage.local.set(Object.fromEntries(data));
+        if (parent.id !== info.id) {
+          browser.storage.local.remove(parent.id);
+          parent.id = info.id;
+        }
+      });
+    }
   };
   tr.children[0].append(save);
   const del = document.createElement("button");
   del.onclick = (ev) => {
     const parent = (ev.target as HTMLElement).parentElement!.parentElement!;
+    if (parent.querySelector<HTMLInputElement>("#sync")!.checked) {
+      SYNC = SYNC.filter((val) => val !== parent.id);
+      browser.storage.sync.set({ sync: SYNC }).then(() => {
+        browser.storage.sync.remove(id);
+      });
+    } else {
+      LOCAL = LOCAL.filter((val) => val !== parent.id);
+      browser.storage.local.set({ local: LOCAL }).then(() => {
+        browser.storage.local.remove(id);
+      });
+    }
     parent.remove();
-    LIST = LIST.filter((val) => val !== parent.id);
-    browser.storage.local.set({ list: LIST }).then(() => {
-      browser.storage.local.remove(id);
-    });
   };
   del.innerText = "Delete";
   tr.children[0].append(del);
   tr.id = id;
 };
 
-browser.storage.local.get("list").then((res) => {
-  LIST = res.list ?? [];
-  LIST.forEach((id) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const getKeys = (res: { [key: string]: any }, sync: boolean) => {
+  const list: string[] = Object.values(res)[0] ?? [];
+  list.forEach((id) => {
     const tr = CLONE.cloneNode(true) as HTMLElement;
-    tr.querySelector<HTMLSelectElement>("#key")!.value = id.substring(
-      0,
-      id.length - 1
-    );
-    browser.storage.local.get(id).then((res) => {
-      const code = Object.values(res)[0] ?? "";
-      tr.querySelector<HTMLTextAreaElement>("textarea")!.value = code;
-    });
+    const key = tr.querySelector<HTMLSelectElement>("#key")!;
+    key.value = id.substring(0, id.length - 1);
+    key.onchange = (ev) => {
+      (
+        ev.target as HTMLElement
+      ).parentElement!.parentElement!.querySelector<HTMLInputElement>(
+        "#sync"
+      )!.disabled = true;
+    };
+    const text = tr.querySelector<HTMLTextAreaElement>("textarea")!;
+    text.oninput = (ev) => {
+      (
+        ev.target as HTMLElement
+      ).parentElement!.parentElement!.querySelector<HTMLInputElement>(
+        "#sync"
+      )!.disabled = true;
+    };
+    const syncEle = tr.querySelector<HTMLInputElement>("#sync")!;
+    syncEle.oninput = (ev) => {
+      const info = getInfo(
+        (ev.target as HTMLElement)!.parentElement!.parentElement!
+      );
+      const data = new Map();
+      data.set(info.id, info.code);
+      console.log(info.code);
+      if (info.sync) {
+        LOCAL = LOCAL.filter((val) => val !== info.id);
+        browser.storage.local.set({ local: LOCAL }).then(() => {
+          browser.storage.local.remove(id);
+        });
+        SYNC.push(info.id);
+        browser.storage.sync.set({ sync: SYNC }).then(() => {
+          browser.storage.sync.set(Object.fromEntries(data));
+        });
+      } else {
+        SYNC = SYNC.filter((val) => val !== info.id);
+        browser.storage.sync.set({ sync: SYNC }).then(() => {
+          browser.storage.sync.remove(id);
+        });
+        LOCAL.push(info.id);
+        browser.storage.local.set({ local: LOCAL }).then(() => {
+          browser.storage.local.set(Object.fromEntries(data));
+        });
+      }
+    };
+    if (sync) {
+      syncEle.checked = sync;
+      browser.storage.sync.get(id).then((res) => {
+        text.value = Object.values(res)[0] ?? "";
+      });
+    } else {
+      browser.storage.local.get(id).then((res) => {
+        text.value = Object.values(res)[0] ?? "";
+      });
+    }
     const mods = tr
       .querySelector("#mods")!
       .querySelectorAll<HTMLInputElement>("input")!;
+    mods.forEach((el) => {
+      el.onchange = (ev) => {
+        (
+          ev.target as HTMLElement
+        ).parentElement!.parentElement!.parentElement!.querySelector<HTMLInputElement>(
+          "#sync"
+        )!.disabled = true;
+      };
+    });
     let opts: number[];
     switch (id.charAt(id.length - 1)) {
       case "1":
@@ -101,6 +182,15 @@ browser.storage.local.get("list").then((res) => {
     replace(tr, id);
     TBODY.append(tr);
   });
+  return list;
+};
+
+browser.storage.local.get("local").then((res) => {
+  LOCAL = getKeys(res, false);
+});
+
+browser.storage.sync.get("sync").then((res) => {
+  SYNC = getKeys(res, true);
 });
 
 document.getElementById("submit")!.onclick = () => {
@@ -113,12 +203,17 @@ document.getElementById("submit")!.onclick = () => {
   replace(tr, info.id);
   tr.querySelector<HTMLSelectElement>("#key")!.value = info.key;
   TBODY.append(tr);
-  LIST.push(info.id);
-  info.sync
-    ? browser.storage.sync.set({ list: LIST })
-    : browser.storage.local.set({ list: LIST }).then(() => {
-      const data = new Map();
-      data.set(info.id, info.code);
+  const data = new Map();
+  data.set(info.id, info.code);
+  if (info.sync) {
+    SYNC.push(info.id);
+    browser.storage.sync.set({ sync: SYNC }).then(() => {
+      browser.storage.sync.set(Object.fromEntries(data));
+    });
+  } else {
+    LOCAL.push(info.id);
+    browser.storage.local.set({ local: LOCAL }).then(() => {
       browser.storage.local.set(Object.fromEntries(data));
     });
+  }
 };
