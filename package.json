@@ -1,7 +1,7 @@
 {
-  "name": "CodeInjector",
+  "name": "ManuelCodeInjector",
   "version": "1.0.0",
-  "description": "Browser extension to inject custom scripts",
+  "description": "Browser extension to inject personal code using customizable hotkeys",
   "scripts": {
     "build": "web-ext build -s dist -i '**/*.css.map' --overwrite-dest",
     "sass": "sass src:dest --update"

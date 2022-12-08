@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "Script Injector",
+  "name": "ManuelCodeInjector",
   "version": "1.0.0",
-  "description": "Inject custom scripts using hotkeys",
+  "description": "Inject personal code using customizable hotkeys",
   "permissions": [
     "<all_urls>",
     "activeTab",
@@ -17,14 +17,15 @@
   },
   "icons": {
     "16": "./icons/icon-16.png",
+    "32": "./icons/icon-32.png",
     "48": "./icons/icon-48.png",
     "128": "./icons/icon-128.png"
   },
   "browser_action": {
     "browser_style": true,
-    "default_icon": "./icons/icon-48.png",
+    "default_icon": "./icons/icon-32.png",
     "default_popup": "./popup/index.html",
-    "default_title": "Script Injector"
+    "default_title": "ManuelCodeInjector"
   },
   "options_ui": {
     "browser_style": true,
