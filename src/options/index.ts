@@ -4,18 +4,18 @@ let LOCAL: string[];
 let SYNC: string[];
 
 const getInfo = (ele: HTMLElement) => {
-  const key = ele.querySelector<HTMLSelectElement>("#key")!.value;
+  const key = ele.querySelector<HTMLSelectElement>(".key")!.value;
   return {
     id: `${key}${Array.from(
-      ele.querySelector("#mods")!.querySelectorAll<HTMLInputElement>("input")
+      ele.querySelector(".mods")!.querySelectorAll<HTMLInputElement>("input")
     )
       .map((ele) => Number(ele.checked))
       .reduce((sum, cur, i) =>
         cur ? (i === 2 ? sum + 4 : sum + i + 1) : sum
       )}`,
     key: key,
-    sync: ele.querySelector<HTMLInputElement>("#sync")!.checked,
-    code: ele.querySelector<HTMLTextAreaElement>("#code")!.value,
+    sync: ele.querySelector<HTMLInputElement>(".sync")!.checked,
+    code: ele.querySelector<HTMLTextAreaElement>(".code")!.value,
   };
 };
 
@@ -28,7 +28,7 @@ const replace = (tr: HTMLElement, id: string) => {
     (
       ev.target as HTMLElement
     ).parentElement!.parentElement!.querySelector<HTMLInputElement>(
-      "#sync"
+      ".sync"
     )!.disabled = false;
     const parent = (ev.target as HTMLElement).parentElement!.parentElement!;
     const info = getInfo(parent);
@@ -40,13 +40,22 @@ const replace = (tr: HTMLElement, id: string) => {
     data.set(info.id, info.code);
     if (info.sync) {
       SYNC[SYNC.findIndex((val) => val === parent.id)] = info.id;
-      browser.storage.sync.set({ sync: SYNC }).then(() => {
-        browser.storage.sync.set(Object.fromEntries(data));
-        if (parent.id !== info.id) {
-          browser.storage.sync.remove(parent.id);
-          parent.id = info.id;
-        }
-      });
+      browser.storage.sync
+        .set({ sync: SYNC })
+        .then(() => {
+          browser.storage.sync.set(Object.fromEntries(data));
+          if (parent.id !== info.id) {
+            browser.storage.sync.remove(parent.id);
+            parent.id = info.id;
+          }
+        })
+        .then(() => {
+          browser.storage.sync.getBytesInUse(info.id).then((res) => {
+            tr.querySelector<HTMLElement>(
+              ".size"
+            )!.innerText = `${res.toString()} B`;
+          });
+        });
     } else {
       LOCAL[LOCAL.findIndex((val) => val === parent.id)] = info.id;
       browser.storage.local.set({ local: LOCAL }).then(() => {
@@ -62,7 +71,7 @@ const replace = (tr: HTMLElement, id: string) => {
   const del = document.createElement("button");
   del.onclick = (ev) => {
     const parent = (ev.target as HTMLElement).parentElement!.parentElement!;
-    if (parent.querySelector<HTMLInputElement>("#sync")!.checked) {
+    if (parent.querySelector<HTMLInputElement>(".sync")!.checked) {
       SYNC = SYNC.filter((val) => val !== parent.id);
       browser.storage.sync.set({ sync: SYNC }).then(() => {
         browser.storage.sync.remove(id);
@@ -85,13 +94,13 @@ const getKeys = (res: { [key: string]: any }, sync: boolean) => {
   const list: string[] = Object.values(res)[0] ?? [];
   list.forEach((id) => {
     const tr = CLONE.cloneNode(true) as HTMLElement;
-    const key = tr.querySelector<HTMLSelectElement>("#key")!;
+    const key = tr.querySelector<HTMLSelectElement>(".key")!;
     key.value = id.substring(0, id.length - 1);
     key.onchange = (ev) => {
       (
         ev.target as HTMLElement
       ).parentElement!.parentElement!.querySelector<HTMLInputElement>(
-        "#sync"
+        ".sync"
       )!.disabled = true;
     };
     const text = tr.querySelector<HTMLTextAreaElement>("textarea")!;
@@ -99,26 +108,54 @@ const getKeys = (res: { [key: string]: any }, sync: boolean) => {
       (
         ev.target as HTMLElement
       ).parentElement!.parentElement!.querySelector<HTMLInputElement>(
-        "#sync"
+        ".sync"
       )!.disabled = true;
+      (
+        ev.target as HTMLElement
+      ).parentElement!.parentElement!.querySelector<HTMLElement>(
+        ".size"
+      )!.innerText = `~${new Blob([
+        (ev.target as HTMLTextAreaElement).value,
+      ]).size.toString()} B`;
     };
-    const syncEle = tr.querySelector<HTMLInputElement>("#sync")!;
+    text.onkeydown = (ev) => {
+      if (ev.key === "Tab") {
+        ev.preventDefault();
+        const ele = ev.target as HTMLTextAreaElement;
+        const start = ele.selectionStart;
+        ele.value =
+          ele.value.substring(0, start) +
+          "\t" +
+          ele.value.substring(ele.selectionEnd);
+        ele.selectionStart = ele.selectionEnd = start + 1;
+      } else if (ev.key === "Escape") {
+        (ev.target as HTMLElement).blur();
+      }
+    };
+    const size = tr.querySelector<HTMLElement>(".size")!;
+    const syncEle = tr.querySelector<HTMLInputElement>(".sync")!;
     syncEle.oninput = (ev) => {
       const info = getInfo(
         (ev.target as HTMLElement)!.parentElement!.parentElement!
       );
       const data = new Map();
       data.set(info.id, info.code);
-      console.log(info.code);
       if (info.sync) {
         LOCAL = LOCAL.filter((val) => val !== info.id);
         browser.storage.local.set({ local: LOCAL }).then(() => {
           browser.storage.local.remove(id);
         });
         SYNC.push(info.id);
-        browser.storage.sync.set({ sync: SYNC }).then(() => {
-          browser.storage.sync.set(Object.fromEntries(data));
-        });
+        browser.storage.sync
+          .set({ sync: SYNC })
+          .then(() => {
+            browser.storage.sync.set(Object.fromEntries(data));
+          })
+          .then(() => {
+            browser.storage.sync.getBytesInUse(info.id).then((res) => {
+              size.innerText = `${res.toString()} B`;
+            });
+          });
       } else {
         SYNC = SYNC.filter((val) => val !== info.id);
         browser.storage.sync.set({ sync: SYNC }).then(() => {
@@ -135,20 +172,25 @@ const getKeys = (res: { [key: string]: any }, sync: boolean) => {
       browser.storage.sync.get(id).then((res) => {
         text.value = Object.values(res)[0] ?? "";
       });
+      browser.storage.sync.getBytesInUse(id).then((res) => {
+        size.innerText = `${res.toString()} B`;
+      });
     } else {
       browser.storage.local.get(id).then((res) => {
-        text.value = Object.values(res)[0] ?? "";
+        const txt = Object.values(res)[0] ?? "";
+        text.value = txt;
+        size.innerText = `~${new Blob([txt.value]).size.toString()} B`;
       });
     }
     const mods = tr
-      .querySelector("#mods")!
+      .querySelector(".mods")!
       .querySelectorAll<HTMLInputElement>("input")!;
     mods.forEach((el) => {
       el.onchange = (ev) => {
         (
           ev.target as HTMLElement
         ).parentElement!.parentElement!.parentElement!.querySelector<HTMLInputElement>(
-          "#sync"
+          ".sync"
         )!.disabled = true;
       };
     });
@@ -185,13 +227,31 @@ const getKeys = (res: { [key: string]: any }, sync: boolean) => {
   return list;
 };
 
-browser.storage.local.get("local").then((res) => {
-  LOCAL = getKeys(res, false);
-});
+const code = document.querySelector<HTMLTextAreaElement>(".code")!;
+code.oninput = (ev) => {
+  (
+    ev.target as HTMLElement
+  ).parentElement!.parentElement!.querySelector<HTMLElement>(
+    ".size"
+  )!.innerText = `~${new Blob([
+    (ev.target as HTMLTextAreaElement).value,
+  ]).size.toString()} B`;
+};
 
-browser.storage.sync.get("sync").then((res) => {
-  SYNC = getKeys(res, true);
-});
+code.onkeydown = (ev) => {
+  if (ev.key === "Tab") {
+    ev.preventDefault();
+    const ele = ev.target as HTMLTextAreaElement;
+    const start = ele.selectionStart;
+    ele.value =
+      ele.value.substring(0, start) +
+      "\t" +
+      ele.value.substring(ele.selectionEnd);
+    ele.selectionStart = ele.selectionEnd = start + 1;
+  } else if (ev.key === "Escape") {
+    (ev.target as HTMLElement).blur();
+  }
+};
 
 document.getElementById("submit")!.onclick = () => {
   const info = getInfo(document.body);
@@ -201,7 +261,7 @@ document.getElementById("submit")!.onclick = () => {
   }
   const tr = CLONE.cloneNode(true) as HTMLElement;
   replace(tr, info.id);
-  tr.querySelector<HTMLSelectElement>("#key")!.value = info.key;
+  tr.querySelector<HTMLSelectElement>(".key")!.value = info.key;
   TBODY.append(tr);
   const data = new Map();
   data.set(info.id, info.code);
@@ -217,3 +277,11 @@ document.getElementById("submit")!.onclick = () => {
     });
   }
 };
+
+browser.storage.local.get("local").then((res) => {
+  LOCAL = getKeys(res, false);
+});
+
+browser.storage.sync.get("sync").then((res) => {
+  SYNC = getKeys(res, true);
+});
