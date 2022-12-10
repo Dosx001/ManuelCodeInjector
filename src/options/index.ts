@@ -89,9 +89,44 @@ const replace = (tr: HTMLElement, id: string) => {
   tr.id = id;
 };
 
+const syncInput = (ev: Event) => {
+  const parent = (ev.target as HTMLButtonElement)!.parentElement!
+    .parentElement!;
+  const info = getInfo(parent);
+  const data = new Map();
+  data.set(info.id, info.code);
+  if (info.sync) {
+    LOCAL = LOCAL.filter((val) => val !== info.id);
+    browser.storage.local.set({ local: LOCAL }).then(() => {
+      browser.storage.local.remove(parent.id);
+    });
+    SYNC.push(info.id);
+    browser.storage.sync
+      .set({ sync: SYNC })
+      .then(() => {
+        browser.storage.sync.set(Object.fromEntries(data));
+      })
+      .then(() => {
+        browser.storage.sync.getBytesInUse(info.id).then((res) => {
+          parent.querySelector<HTMLElement>(
+            ".size"
+          )!.innerText = `${res.toString()} B`;
+        });
+      });
+  } else {
+    SYNC = SYNC.filter((val) => val !== info.id);
+    browser.storage.sync.set({ sync: SYNC }).then(() => {
+      browser.storage.sync.remove(parent.id);
+    });
+    LOCAL.push(info.id);
+    browser.storage.local.set({ local: LOCAL }).then(() => {
+      browser.storage.local.set(Object.fromEntries(data));
+    });
+  }
+};
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getKeys = (res: { [key: string]: any }, sync: boolean) => {
-  const list: string[] = Object.values(res)[0] ?? [];
+const getKeys = (list: string[], sync: boolean) => {
   list.forEach((id) => {
     const tr = CLONE.cloneNode(true) as HTMLElement;
     const key = tr.querySelector<HTMLSelectElement>(".key")!;
@@ -134,39 +169,7 @@ const getKeys = (res: { [key: string]: any }, sync: boolean) => {
     };
     const size = tr.querySelector<HTMLElement>(".size")!;
     const syncEle = tr.querySelector<HTMLInputElement>(".sync")!;
-    syncEle.oninput = (ev) => {
-      const info = getInfo(
-        (ev.target as HTMLElement)!.parentElement!.parentElement!
-      );
-      const data = new Map();
-      data.set(info.id, info.code);
-      if (info.sync) {
-        LOCAL = LOCAL.filter((val) => val !== info.id);
-        browser.storage.local.set({ local: LOCAL }).then(() => {
-          browser.storage.local.remove(id);
-        });
-        SYNC.push(info.id);
-        browser.storage.sync
-          .set({ sync: SYNC })
-          .then(() => {
-            browser.storage.sync.set(Object.fromEntries(data));
-          })
-          .then(() => {
-            browser.storage.sync.getBytesInUse(info.id).then((res) => {
-              size.innerText = `${res.toString()} B`;
-            });
-          });
-      } else {
-        SYNC = SYNC.filter((val) => val !== info.id);
-        browser.storage.sync.set({ sync: SYNC }).then(() => {
-          browser.storage.sync.remove(id);
-        });
-        LOCAL.push(info.id);
-        browser.storage.local.set({ local: LOCAL }).then(() => {
-          browser.storage.local.set(Object.fromEntries(data));
-        });
-      }
-    };
+    syncEle.oninput = (ev) => syncInput(ev);
     if (sync) {
       syncEle.checked = sync;
       browser.storage.sync.get(id).then((res) => {
@@ -224,7 +227,6 @@ const getKeys = (res: { [key: string]: any }, sync: boolean) => {
     replace(tr, id);
     TBODY.append(tr);
   });
-  return list;
 };
 
 const code = document.querySelector<HTMLTextAreaElement>(".code")!;
@@ -259,29 +261,48 @@ document.getElementById("submit")!.onclick = () => {
     alert("Hotkey are ready exists!");
     return;
   }
-  const tr = CLONE.cloneNode(true) as HTMLElement;
-  replace(tr, info.id);
-  tr.querySelector<HTMLSelectElement>(".key")!.value = info.key;
-  TBODY.append(tr);
   const data = new Map();
   data.set(info.id, info.code);
   if (info.sync) {
     SYNC.push(info.id);
     browser.storage.sync.set({ sync: SYNC }).then(() => {
-      browser.storage.sync.set(Object.fromEntries(data));
+      browser.storage.sync
+        .set(Object.fromEntries(data))
+        .then(() => getKeys([info.id], true));
     });
   } else {
     LOCAL.push(info.id);
     browser.storage.local.set({ local: LOCAL }).then(() => {
-      browser.storage.local.set(Object.fromEntries(data));
+      browser.storage.local
+        .set(Object.fromEntries(data))
+        .then(() => getKeys([info.id], false));
     });
   }
 };
 
 browser.storage.local.get("local").then((res) => {
-  LOCAL = getKeys(res, false);
+  const list: string[] = Object.values(res)[0] ?? [];
+  LOCAL = list;
+  getKeys(list, false);
 });
 
 browser.storage.sync.get("sync").then((res) => {
-  SYNC = getKeys(res, true);
+  const list: string[] = Object.values(res)[0] ?? [];
+  SYNC = list;
+  getKeys(list, true);
+});
+
+const update = () => {
+  browser.storage.sync.getBytesInUse(undefined).then((res) => {
+    const store = document.querySelector<HTMLElement>("#storage")!.children;
+    (store[store.length - 1] as HTMLElement).innerText = `${(
+      (102400 - res) /
+      1000
+    ).toString()} kB`;
+  });
+};
+
+update();
+browser.storage.onChanged.addListener(() => {
+  update();
 });
