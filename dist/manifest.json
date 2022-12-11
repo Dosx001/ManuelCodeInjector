@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
-  "name": "ManuelCodeInjector",
-  "version": "1.0.0",
+  "name": "Manual Code Injector",
+  "version": "1.0.1",
   "description": "Inject personal code using customizable hotkeys",
   "permissions": [
     "<all_urls>",
@@ -25,7 +25,7 @@
     "browser_style": true,
     "default_icon": "./icons/icon-32.png",
     "default_popup": "./popup/index.html",
-    "default_title": "ManuelCodeInjector"
+    "default_title": "ManualCodeInjector"
   },
   "options_ui": {
     "browser_style": true,
