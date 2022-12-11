@@ -250,6 +250,14 @@ document.getElementById("submit")!.onclick = () => {
     alert("Hotkey are ready exists!");
     return;
   }
+  document.querySelector<HTMLSelectElement>(".key")!.value = "A";
+  document.querySelector<HTMLTextAreaElement>(".code")!.value = "";
+  document.querySelector<HTMLInputElement>(".sync")!.checked = false;
+  document.querySelector<HTMLElement>(".size")!.innerText = "-";
+  document
+    .querySelector(".mods")!
+    .querySelectorAll<HTMLInputElement>("input")
+    .forEach((el) => (el.checked = false));
   const data = new Map();
   data.set(info.id, info.code);
   if (info.sync) {
