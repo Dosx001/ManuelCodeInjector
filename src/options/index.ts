@@ -125,8 +125,33 @@ const syncInput = (ev: Event) => {
   }
 };
 
+const tab = (ev: KeyboardEvent) => {
+  if (ev.key === "Tab") {
+    ev.preventDefault();
+    const ele = ev.target as HTMLTextAreaElement;
+    const start = ele.selectionStart;
+    ele.value =
+      ele.value.substring(0, start) +
+      "\t" +
+      ele.value.substring(ele.selectionEnd);
+    ele.selectionStart = ele.selectionEnd = start + 1;
+  } else if (ev.key === "Escape") {
+    (ev.target as HTMLElement).blur();
+  }
+};
+
+const updateSize = (ev: Event) => {
+  (
+    ev.target as HTMLElement
+  ).parentElement!.parentElement!.querySelector<HTMLElement>(
+    ".size"
+  )!.innerText = `~${(
+    new Blob([(ev.target as HTMLTextAreaElement).value]).size + 4
+  ).toString()} B`;
+};
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getKeys = (list: string[], sync: boolean) => {
+const mkTr = (list: string[], sync: boolean) => {
   list.forEach((id) => {
     const tr = CLONE.cloneNode(true) as HTMLElement;
     const key = tr.querySelector<HTMLSelectElement>(".key")!;
@@ -145,28 +170,9 @@ const getKeys = (list: string[], sync: boolean) => {
       ).parentElement!.parentElement!.querySelector<HTMLInputElement>(
         ".sync"
       )!.disabled = true;
-      (
-        ev.target as HTMLElement
-      ).parentElement!.parentElement!.querySelector<HTMLElement>(
-        ".size"
-      )!.innerText = `~${new Blob([
-        (ev.target as HTMLTextAreaElement).value,
-      ]).size.toString()} B`;
+      updateSize(ev);
     };
-    text.onkeydown = (ev) => {
-      if (ev.key === "Tab") {
-        ev.preventDefault();
-        const ele = ev.target as HTMLTextAreaElement;
-        const start = ele.selectionStart;
-        ele.value =
-          ele.value.substring(0, start) +
-          "\t" +
-          ele.value.substring(ele.selectionEnd);
-        ele.selectionStart = ele.selectionEnd = start + 1;
-      } else if (ev.key === "Escape") {
-        (ev.target as HTMLElement).blur();
-      }
-    };
+    text.onkeydown = (ev) => tab(ev);
     const size = tr.querySelector<HTMLElement>(".size")!;
     const syncEle = tr.querySelector<HTMLInputElement>(".sync")!;
     syncEle.oninput = (ev) => syncInput(ev);
@@ -231,28 +237,11 @@ const getKeys = (list: string[], sync: boolean) => {
 
 const code = document.querySelector<HTMLTextAreaElement>(".code")!;
 code.oninput = (ev) => {
-  (
-    ev.target as HTMLElement
-  ).parentElement!.parentElement!.querySelector<HTMLElement>(
-    ".size"
-  )!.innerText = `~${new Blob([
-    (ev.target as HTMLTextAreaElement).value,
-  ]).size.toString()} B`;
+  updateSize(ev);
 };
 
 code.onkeydown = (ev) => {
-  if (ev.key === "Tab") {
-    ev.preventDefault();
-    const ele = ev.target as HTMLTextAreaElement;
-    const start = ele.selectionStart;
-    ele.value =
-      ele.value.substring(0, start) +
-      "\t" +
-      ele.value.substring(ele.selectionEnd);
-    ele.selectionStart = ele.selectionEnd = start + 1;
-  } else if (ev.key === "Escape") {
-    (ev.target as HTMLElement).blur();
-  }
+  tab(ev);
 };
 
 document.getElementById("submit")!.onclick = () => {
@@ -268,14 +257,14 @@ document.getElementById("submit")!.onclick = () => {
     browser.storage.sync.set({ sync: SYNC }).then(() => {
       browser.storage.sync
         .set(Object.fromEntries(data))
-        .then(() => getKeys([info.id], true));
+        .then(() => mkTr([info.id], true));
     });
   } else {
     LOCAL.push(info.id);
     browser.storage.local.set({ local: LOCAL }).then(() => {
       browser.storage.local
         .set(Object.fromEntries(data))
-        .then(() => getKeys([info.id], false));
+        .then(() => mkTr([info.id], false));
     });
   }
 };
@@ -283,13 +272,13 @@ document.getElementById("submit")!.onclick = () => {
 browser.storage.local.get("local").then((res) => {
   const list: string[] = Object.values(res)[0] ?? [];
   LOCAL = list;
-  getKeys(list, false);
+  mkTr(list, false);
 });
 
 browser.storage.sync.get("sync").then((res) => {
   const list: string[] = Object.values(res)[0] ?? [];
   SYNC = list;
-  getKeys(list, true);
+  mkTr(list, true);
 });
 
 const update = () => {
