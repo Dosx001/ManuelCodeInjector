@@ -7,7 +7,7 @@ const getInfo = (ele: HTMLElement) => {
   const key = ele.querySelector<HTMLSelectElement>(".key")!.value;
   return {
     id: `${key}${Array.from(
-      ele.querySelector(".mods")!.querySelectorAll<HTMLInputElement>("input")
+      ele.querySelector(".mods")!.querySelectorAll("input")
     )
       .map((ele) => Number(ele.checked))
       .reduce((sum, cur, i) =>
@@ -51,9 +51,7 @@ const replace = (tr: HTMLElement, id: string) => {
         })
         .then(() => {
           browser.storage.sync.getBytesInUse(info.id).then((res) => {
-            tr.querySelector<HTMLElement>(
-              ".size"
-            )!.innerText = `${res.toString()} B`;
+            tr.querySelector<HTMLElement>(".size")!.innerText = `${res} B`;
           });
         });
     } else {
@@ -90,8 +88,7 @@ const replace = (tr: HTMLElement, id: string) => {
 };
 
 const syncInput = (ev: Event) => {
-  const parent = (ev.target as HTMLButtonElement)!.parentElement!
-    .parentElement!;
+  const parent = (ev.target as HTMLElement)!.parentElement!.parentElement!;
   const info = getInfo(parent);
   const data = new Map();
   data.set(info.id, info.code);
@@ -108,9 +105,7 @@ const syncInput = (ev: Event) => {
       })
       .then(() => {
         browser.storage.sync.getBytesInUse(info.id).then((res) => {
-          parent.querySelector<HTMLElement>(
-            ".size"
-          )!.innerText = `${res.toString()} B`;
+          parent.querySelector<HTMLElement>(".size")!.innerText = `${res} B`;
         });
       });
   } else {
@@ -135,9 +130,7 @@ const tab = (ev: KeyboardEvent) => {
       "\t" +
       ele.value.substring(ele.selectionEnd);
     ele.selectionStart = ele.selectionEnd = start + 1;
-  } else if (ev.key === "Escape") {
-    (ev.target as HTMLElement).blur();
-  }
+  } else if (ev.key === "Escape") (ev.target as HTMLElement).blur();
 };
 
 const updateSize = (ev: Event) => {
@@ -145,12 +138,10 @@ const updateSize = (ev: Event) => {
     ev.target as HTMLElement
   ).parentElement!.parentElement!.querySelector<HTMLElement>(
     ".size"
-  )!.innerText = `~${(
-    new Blob([(ev.target as HTMLTextAreaElement).value]).size + 4
-  ).toString()} B`;
+  )!.innerText = `~${new Blob([(ev.target as HTMLTextAreaElement).value]).size + 4
+    } B`;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mkTr = (list: string[], sync: boolean) => {
   list.forEach((id) => {
     const tr = CLONE.cloneNode(true) as HTMLElement;
@@ -163,7 +154,8 @@ const mkTr = (list: string[], sync: boolean) => {
         ".sync"
       )!.disabled = true;
     };
-    const text = tr.querySelector<HTMLTextAreaElement>("textarea")!;
+    const text = tr.querySelector("textarea")!;
+    text.onkeydown = tab;
     text.oninput = (ev) => {
       (
         ev.target as HTMLElement
@@ -172,28 +164,24 @@ const mkTr = (list: string[], sync: boolean) => {
       )!.disabled = true;
       updateSize(ev);
     };
-    text.onkeydown = (ev) => tab(ev);
     const size = tr.querySelector<HTMLElement>(".size")!;
     const syncEle = tr.querySelector<HTMLInputElement>(".sync")!;
-    syncEle.oninput = (ev) => syncInput(ev);
+    syncEle.oninput = syncInput;
     if (sync) {
       syncEle.checked = sync;
-      browser.storage.sync.get(id).then((res) => {
-        text.value = Object.values(res)[0] ?? "";
-      });
-      browser.storage.sync.getBytesInUse(id).then((res) => {
-        size.innerText = `${res.toString()} B`;
-      });
-    } else {
+      browser.storage.sync
+        .get(id)
+        .then((res) => (text.value = Object.values(res)[0] ?? ""));
+      browser.storage.sync
+        .getBytesInUse(id)
+        .then((res) => (size.innerText = `${res} B`));
+    } else
       browser.storage.local.get(id).then((res) => {
-        const txt = Object.values(res)[0] ?? "";
-        text.value = txt;
-        size.innerText = `~${new Blob([txt.value]).size.toString()} B`;
+        text.value = Object.values(res)[0] ?? "";
+        size.innerText = `~${new Blob([text.value.valueOf()]).size} B`;
       });
-    }
-    const mods = tr
-      .querySelector(".mods")!
-      .querySelectorAll<HTMLInputElement>("input")!;
+
+    const mods = tr.querySelector(".mods")!.querySelectorAll("input")!;
     mods.forEach((el) => {
       el.onchange = (ev) => {
         (
@@ -236,13 +224,8 @@ const mkTr = (list: string[], sync: boolean) => {
 };
 
 const code = document.querySelector<HTMLTextAreaElement>(".code")!;
-code.oninput = (ev) => {
-  updateSize(ev);
-};
-
-code.onkeydown = (ev) => {
-  tab(ev);
-};
+code.oninput = updateSize;
+code.onkeydown = tab;
 
 document.getElementById("submit")!.onclick = () => {
   const info = getInfo(document.body);
@@ -256,7 +239,7 @@ document.getElementById("submit")!.onclick = () => {
   document.querySelector<HTMLElement>(".size")!.innerText = "-";
   document
     .querySelector(".mods")!
-    .querySelectorAll<HTMLInputElement>("input")
+    .querySelectorAll("input")
     .forEach((el) => (el.checked = false));
   const data = new Map();
   data.set(info.id, info.code);
@@ -278,28 +261,19 @@ document.getElementById("submit")!.onclick = () => {
 };
 
 browser.storage.local.get("local").then((res) => {
-  const list: string[] = Object.values(res)[0] ?? [];
-  LOCAL = list;
-  mkTr(list, false);
+  LOCAL = Object.values(res)[0] ?? [];
+  mkTr(LOCAL, false);
 });
 
 browser.storage.sync.get("sync").then((res) => {
-  const list: string[] = Object.values(res)[0] ?? [];
-  SYNC = list;
-  mkTr(list, true);
+  SYNC = Object.values(res)[0] ?? [];
+  mkTr(SYNC, true);
 });
 
-const update = () => {
-  browser.storage.sync.getBytesInUse(undefined).then((res) => {
-    const store = document.querySelector<HTMLElement>("#storage")!.children;
-    (store[store.length - 1] as HTMLElement).innerText = `${(
-      (102400 - res) /
-      1000
-    ).toString()} kB`;
-  });
+const update = async () => {
+  const store = document.querySelector("#storage")!.children;
+  (store[store.length - 1] as HTMLElement).innerText = `${(102400 - (await browser.storage.sync.getBytesInUse())) / 1000
+    } kB`;
 };
-
 update();
-browser.storage.onChanged.addListener(() => {
-  update();
-});
+browser.storage.onChanged.addListener(update);
