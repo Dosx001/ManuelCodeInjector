@@ -143,7 +143,7 @@ const updateSize = (ev: Event) => {
 };
 
 const mkTr = (list: string[], sync: boolean) => {
-  list.forEach((id) => {
+  for (const id of list) {
     const tr = CLONE.cloneNode(true) as HTMLElement;
     const key = tr.querySelector<HTMLSelectElement>(".key")!;
     key.value = id.substring(0, id.length - 1);
@@ -182,7 +182,7 @@ const mkTr = (list: string[], sync: boolean) => {
       });
 
     const mods = tr.querySelector(".mods")!.querySelectorAll("input")!;
-    mods.forEach((el) => {
+    for (const el of mods)
       el.onchange = (ev) => {
         (
           ev.target as HTMLElement
@@ -190,37 +190,35 @@ const mkTr = (list: string[], sync: boolean) => {
           ".sync"
         )!.disabled = true;
       };
-    });
-    let opts: number[];
+    const fn = (nums: number[]) => {
+      for (const i of nums) mods[i].checked = true;
+    };
     switch (id.charAt(id.length - 1)) {
       case "1":
-        opts = [0];
+        fn([0]);
         break;
       case "2":
-        opts = [1];
+        fn([1]);
         break;
       case "3":
-        opts = [0, 1];
+        fn([0, 1]);
         break;
       case "4":
-        opts = [2];
+        fn([2]);
         break;
       case "5":
-        opts = [0, 2];
+        fn([0, 2]);
         break;
       case "6":
-        opts = [1, 2];
+        fn([1, 2]);
         break;
       case "7":
-        opts = [0, 1, 2];
+        fn([0, 1, 2]);
         break;
-      default:
-        opts = [];
     }
-    opts.forEach((i) => (mods[i].checked = true));
     replace(tr, id);
     TBODY.append(tr);
-  });
+  }
 };
 
 const code = document.querySelector<HTMLTextAreaElement>(".code")!;
@@ -228,19 +226,15 @@ code.oninput = updateSize;
 code.onkeydown = tab;
 
 document.getElementById("submit")!.onclick = () => {
-  const info = getInfo(document.body);
-  if (document.getElementById(info.id)) {
-    alert("Hotkey are ready exists!");
-    return;
-  }
+  const info = getInfo(TBODY);
+  if (document.getElementById(info.id))
+    return alert("Hotkey are ready exists!");
   document.querySelector<HTMLSelectElement>(".key")!.value = "A";
   document.querySelector<HTMLTextAreaElement>(".code")!.value = "";
   document.querySelector<HTMLInputElement>(".sync")!.checked = false;
   document.querySelector<HTMLElement>(".size")!.innerText = "-";
-  document
-    .querySelector(".mods")!
-    .querySelectorAll("input")
-    .forEach((el) => (el.checked = false));
+  for (const el of document.querySelector(".mods")!.querySelectorAll("input"))
+    el.checked = false;
   const data = new Map();
   data.set(info.id, info.code);
   if (info.sync) {

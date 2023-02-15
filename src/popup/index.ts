@@ -1,5 +1,2 @@
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("opts")!.addEventListener("click", () => {
-    window.open(browser.runtime.getURL("../options/index.html"));
-  });
-});
+document.getElementById("opts")!.onclick = () =>
+  window.open(browser.runtime.getURL("../options/index.html"));
