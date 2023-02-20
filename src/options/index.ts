@@ -226,7 +226,7 @@ code.oninput = updateSize;
 code.onkeydown = tab;
 
 document.getElementById("submit")!.onclick = () => {
-  const info = getInfo(TBODY);
+  const info = getInfo(CLONE);
   if (document.getElementById(info.id))
     return alert("Hotkey are ready exists!");
   document.querySelector<HTMLSelectElement>(".key")!.value = "A";
