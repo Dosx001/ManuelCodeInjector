@@ -1,7 +1,8 @@
 import type { Component } from "solid-js";
+import "./styles.scss";
 
 const App: Component = () => {
-  return <div>hello</div>;
+  return <div class="">hello</div>;
 };
 
 export default App;
