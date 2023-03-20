@@ -30,21 +30,15 @@
   "options_ui": {
     "browser_style": true,
     "open_in_tab": true,
-    "page": "./options/index.html"
+    "page": "./index.html"
   },
   "background": {
-    "scripts": [
-      "background.js"
-    ]
+    "scripts": ["background.js"]
   },
   "content_scripts": [
     {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "main.js"
-      ]
+      "matches": ["<all_urls>"],
+      "js": ["main.js"]
     }
   ]
 }

@@ -7,7 +7,6 @@
     "types": ["vite/client"],
     "module": "commonjs",
     "rootDir": "./src",
-    "outDir": "dist",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
