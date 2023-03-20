@@ -2,6 +2,9 @@
   "compilerOptions": {
     "target": "esnext",
     "lib": ["esnext", "dom", "dom.iterable"],
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
+    "types": ["vite/client"],
     "module": "commonjs",
     "rootDir": "./src",
     "outDir": "dist",
@@ -10,5 +13,5 @@
     "strict": true,
     "skipLibCheck": true
   },
-  "exclude": ["src-vite"]
+  "include": ["src"]
 }

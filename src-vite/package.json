@@ -3,15 +3,19 @@
   "version": "1.0.0",
   "description": "Browser extension to inject personal code using customizable hotkeys",
   "scripts": {
-    "build": "web-ext build -s dist -i '**/*.css.map' --overwrite-dest",
-    "sass": "sass --update src:dist",
-    "tar": "tar czvf ManuelCodeInjector.tar.gz src dist build.sh package.json tsconfig.json yarn.lock README_FIREFOX.md"
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "solid-js": "^1.6.15"
   },
   "devDependencies": {
-    "@types/firefox-webext-browser": "^94.0.1",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
     "eslint": "^8.28.0",
-    "typescript": "^4.9.3"
+    "eslint-plugin-solid": "^0.11.0",
+    "typescript": "^4.9.3",
+    "vite": "^4.2.0",
+    "vite-plugin-solid": "^2.6.1"
   }
 }
