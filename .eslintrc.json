@@ -1,19 +1,25 @@
 {
-  "env": {
-    "browser": true,
-    "commonjs": true,
-    "es2021": true
-  },
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended"
+  "overrides": [
+    {
+      "extends": [
+        "plugin:@typescript-eslint/recommended-requiring-type-checking"
+      ],
+      "files": ["*.ts", "*.tsx"],
+      "parserOptions": {
+        "project": "tsconfig.json"
+      }
+    }
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "ecmaVersion": "latest"
+    "project": "./tsconfig.json"
   },
-  "plugins": [
-    "@typescript-eslint"
+  "plugins": ["solid", "@typescript-eslint"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:solid/recommended"
   ],
   "rules": {
     "@typescript-eslint/no-non-null-assertion": "off"

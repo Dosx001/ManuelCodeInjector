@@ -1,11 +1,10 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "lib": [
-      "esnext",
-      "dom",
-      "dom.iterable"
-    ],
+    "lib": ["esnext", "dom", "dom.iterable"],
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
+    "types": ["vite/client"],
     "module": "commonjs",
     "rootDir": "./src",
     "outDir": "dist",
@@ -13,5 +12,6 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true
-  }
+  },
+  "include": ["src"]
 }
