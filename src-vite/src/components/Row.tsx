@@ -2,11 +2,13 @@ import { onMount } from "solid-js";
 import browser from "webextension-polyfill";
 
 const Row = (props: { key: string }) => {
-  let textarea!: HTMLTextAreaElement;
-  let size!: HTMLTableCellElement;
+  let key!: HTMLSelectElement;
   let mods!: HTMLTableCellElement;
+  let size!: HTMLTableCellElement;
+  let textarea!: HTMLTextAreaElement;
   onMount(async () => {
     if (!props.key) return;
+    key.value = props.key.substring(0, props.key.length - 1);
     textarea.value = (
       (await browser.storage.sync.get(props.key)) as { [key: string]: string }
     )[props.key];
@@ -56,7 +58,7 @@ const Row = (props: { key: string }) => {
           )}
       </td>
       <td>
-        <select autocomplete="off">
+        <select ref={key} autocomplete="off">
           <option value="A">A</option>
           <option value="B">B</option>
           <option value="C">C</option>
