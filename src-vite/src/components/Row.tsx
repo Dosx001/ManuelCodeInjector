@@ -61,6 +61,11 @@ const Row = (props: {
         break;
     }
   });
+  const getKey = () =>
+    `${key.value}${Array.from(mods.querySelectorAll("input")).reduce(
+      (sum, el, i) => (el.checked ? (i === 2 ? sum + 4 : sum + i + 1) : sum),
+      0
+    )}`;
   return (
     <tr>
       <td>
