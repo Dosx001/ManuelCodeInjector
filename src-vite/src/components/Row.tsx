@@ -120,7 +120,20 @@ const Row = (props: {
               >
                 Save
               </button>
-              <button>Delete</button>
+              <button
+                onClick={() => {
+                  const keys = props.get!().filter((id) => id !== props.key);
+                  if (sync.checked) {
+                    browser.storage.sync.set({ sync: keys });
+                    browser.storage.sync.remove(props.key);
+                  } else {
+                    browser.storage.local.set({ local: keys });
+                    browser.storage.local.remove(props.key);
+                  }
+                }}
+              >
+                Delete
+              </button>
             </>
           )}
       </td>
