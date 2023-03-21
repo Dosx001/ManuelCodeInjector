@@ -94,7 +94,32 @@ const Row = (props: {
           </button>
         )) || (
             <>
-              <button class="mb-2">Save</button>
+              <button
+                class="mb-2"
+                onClick={() => {
+                  const key = getKey();
+                  if (props.key !== key && document.getElementById(key))
+                    return alert("Hotkey are ready exists!");
+                  props.get!()[props.get!().findIndex((id) => id === props.key)] =
+                    key;
+                  if (sync.checked) {
+                    browser.storage.sync.set({
+                      [key]: textarea.value,
+                      sync: props.get!(),
+                    });
+                    if (props.key !== key) browser.storage.sync.remove(props.key);
+                  } else {
+                    browser.storage.local.set({
+                      [key]: textarea.value,
+                      local: props.get!(),
+                    });
+                    if (props.key !== key)
+                      browser.storage.local.remove(props.key);
+                  }
+                }}
+              >
+                Save
+              </button>
               <button>Delete</button>
             </>
           )}
