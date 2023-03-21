@@ -22,14 +22,8 @@ const App: Component = () => {
   return (
     <>
       <div>Remaining online storage: {bytes()}</div>
-      <div
-        class="mt-1 max-h-[93vh] overflow-auto border-[gray]"
-        style={{
-          "border-top": "2px solid gray",
-          "border-bottom": "2px solid gray",
-        }}
-      >
-        <table>
+      <div class="mt-1 max-h-[93vh] overflow-auto border-y-2 border-[gray]">
+        <table class="w-full border-separate border-spacing-0 border-l-2 border-[gray] bg-[#181a1b]">
           <thead>
             <tr>
               <th>Actions</th>
@@ -38,7 +32,7 @@ const App: Component = () => {
               <th>
                 Sync{" "}
                 <span
-                  class="border-X cursor-help rounded-full bg-[darkgray] text-black"
+                  class="cursor-help rounded-full border-x-[7px] border-[darkgray] bg-[darkgray] text-black"
                   title="Check to sync hotkey to your Firefox account, limited space is available. If not, hotkey is saved to your local machine."
                 >
                   ?

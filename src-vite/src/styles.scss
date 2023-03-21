@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 @import "../../src/base.scss";
+*,
+::before,
+::after {
+  border-width: 0;
+  border-style: solid;
+  border-color: theme("borderColor.DEFAULT", currentColor);
+}
 @layer base {
   button {
     @apply h-8 cursor-pointer rounded-md border-2 border-[gray] bg-black text-base text-[darkgray];
@@ -11,21 +18,12 @@
 }
 @layer utilities {
 }
-.border-X {
-  border-left: 7px solid darkgray;
-  border-right: 7px solid darkgray;
-}
 thead {
   background: #181a1b;
   position: sticky;
   top: 0;
 }
 table {
-  background: #181a1b;
-  border-collapse: separate;
-  border-left: 2px solid gray;
-  border-spacing: 0;
-  width: 100%;
   th,
   td {
     border-bottom: 2px solid gray;
