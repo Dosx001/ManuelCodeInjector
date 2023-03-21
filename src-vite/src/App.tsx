@@ -1,14 +1,16 @@
-import { Component, createSignal, onMount } from "solid-js";
+import { Component, createSignal, For, onMount } from "solid-js";
 import browser from "webextension-polyfill";
 import Row from "./components/Row";
 import "./styles.scss";
 
 const App: Component = () => {
   const [bytes, setBytes] = createSignal("0 kB");
+  const [sync, setSync] = createSignal<string[]>([]);
   onMount(async () => {
     setBytes(
       `${(102400 - (await browser.storage.sync.getBytesInUse())) / 1000} kB`
     );
+    setSync((await browser.storage.sync.get("sync"))["sync"] as string[]);
   });
   return (
     <>
@@ -34,7 +36,9 @@ const App: Component = () => {
             </tr>
             <Row key="" />
           </thead>
-          <tbody />
+          <tbody>
+            <For each={sync()}>{(key) => <Row key={key} />}</For>
+          </tbody>
         </table>
       </div>
     </>

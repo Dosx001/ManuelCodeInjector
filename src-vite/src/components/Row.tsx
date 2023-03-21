@@ -1,4 +1,19 @@
+import { onMount } from "solid-js";
+import browser from "webextension-polyfill";
+
 const Row = (props: { key: string }) => {
+  let textarea!: HTMLTextAreaElement;
+  let size!: HTMLTableCellElement;
+  onMount(async () => {
+    if (props.key) {
+      textarea.value = (
+        (await browser.storage.sync.get(props.key)) as { [key: string]: string }
+      )[props.key];
+      size.innerText = `${await browser.storage.sync.getBytesInUse(
+        props.key
+      )} B`;
+    }
+  });
   return (
     <tr>
       <td>
@@ -82,10 +97,10 @@ const Row = (props: { key: string }) => {
       <td>
         <input class="sync" type="checkbox" autocomplete="off" />
       </td>
-      <td class="size">-</td>
+      <td ref={size}>-</td>
       <td>
         <textarea
-          class="code"
+          ref={textarea}
           cols="40"
           rows="5"
           placeholder="Type code here"
