@@ -1,4 +1,4 @@
-import { Accessor, onMount } from "solid-js";
+import { Accessor, onMount, Show } from "solid-js";
 import browser from "webextension-polyfill";
 
 const Row = (props: {
@@ -71,74 +71,74 @@ const Row = (props: {
   return (
     <tr id={props.key}>
       <td>
-        {(props.key.length === 0 && (
+        <Show
+          when={props.get}
+          fallback={
+            <button
+              type="button"
+              onClick={async () => {
+                const key = getKey();
+                if (document.getElementById(key))
+                  return alert("Hotkey are ready exists!");
+                const code = textarea.value;
+                if (sync.checked) {
+                  const keys: string[] =
+                    (await browser.storage.sync.get("sync"))["sync"] || [];
+                  keys.push(key);
+                  browser.storage.sync.set({ [key]: code, sync: keys });
+                } else {
+                  const keys: string[] =
+                    (await browser.storage.local.get("local"))["local"] || [];
+                  keys.push(key);
+                  browser.storage.local.set({ [key]: code, local: keys });
+                }
+              }}
+            >
+              Add
+            </button>
+          }
+        >
           <button
-            type="button"
-            onClick={async () => {
+            class="mb-2"
+            onClick={() => {
               const key = getKey();
-              if (document.getElementById(key))
+              if (props.key !== key && document.getElementById(key))
                 return alert("Hotkey are ready exists!");
-              const code = textarea.value;
+              props.get!()[props.get!().findIndex((id) => id === props.key)] =
+                key;
               if (sync.checked) {
-                const keys: string[] =
-                  (await browser.storage.sync.get("sync"))["sync"] || [];
-                keys.push(key);
-                browser.storage.sync.set({ [key]: code, sync: keys });
+                browser.storage.sync.set({
+                  [key]: textarea.value,
+                  sync: props.get!(),
+                });
+                if (props.key !== key) browser.storage.sync.remove(props.key);
               } else {
-                const keys: string[] =
-                  (await browser.storage.local.get("local"))["local"] || [];
-                keys.push(key);
-                browser.storage.local.set({ [key]: code, local: keys });
+                browser.storage.local.set({
+                  [key]: textarea.value,
+                  local: props.get!(),
+                });
+                if (props.key !== key) browser.storage.local.remove(props.key);
+              }
+              sync.disabled = false;
+            }}
+          >
+            Save
+          </button>
+          <button
+            onClick={() => {
+              const keys = props.get!().filter((id) => id !== props.key);
+              if (sync.checked) {
+                browser.storage.sync.set({ sync: keys });
+                browser.storage.sync.remove(props.key);
+              } else {
+                browser.storage.local.set({ local: keys });
+                browser.storage.local.remove(props.key);
               }
             }}
           >
-            Add
+            Delete
           </button>
-        )) || (
-            <>
-              <button
-                class="mb-2"
-                onClick={() => {
-                  const key = getKey();
-                  if (props.key !== key && document.getElementById(key))
-                    return alert("Hotkey are ready exists!");
-                  props.get!()[props.get!().findIndex((id) => id === props.key)] =
-                    key;
-                  if (sync.checked) {
-                    browser.storage.sync.set({
-                      [key]: textarea.value,
-                      sync: props.get!(),
-                    });
-                    if (props.key !== key) browser.storage.sync.remove(props.key);
-                  } else {
-                    browser.storage.local.set({
-                      [key]: textarea.value,
-                      local: props.get!(),
-                    });
-                    if (props.key !== key)
-                      browser.storage.local.remove(props.key);
-                  }
-                  sync.disabled = false;
-                }}
-              >
-                Save
-              </button>
-              <button
-                onClick={() => {
-                  const keys = props.get!().filter((id) => id !== props.key);
-                  if (sync.checked) {
-                    browser.storage.sync.set({ sync: keys });
-                    browser.storage.sync.remove(props.key);
-                  } else {
-                    browser.storage.local.set({ local: keys });
-                    browser.storage.local.remove(props.key);
-                  }
-                }}
-              >
-                Delete
-              </button>
-            </>
-          )}
+        </Show>
       </td>
       <td>
         <select ref={key} autocomplete="off" onChange={disable}>
