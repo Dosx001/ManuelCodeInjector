@@ -219,7 +219,10 @@ const Row = (props: {
           placeholder="Type code here"
           autocomplete="off"
           spellcheck={false}
-          onInput={disable}
+          onInput={() => {
+            disable();
+            size.innerText = `~${new Blob([textarea.value]).size + 4} B`;
+          }}
         />
       </td>
     </tr>
