@@ -10,11 +10,22 @@ const Row = (props: { key: string; sync: boolean }) => {
   onMount(async () => {
     if (!props.key) return;
     key.value = props.key.substring(0, props.key.length - 1);
-    if (props.sync) sync.checked = true;
-    textarea.value = (
-      (await browser.storage.sync.get(props.key)) as { [key: string]: string }
-    )[props.key];
-    size.innerText = `${await browser.storage.sync.getBytesInUse(props.key)} B`;
+    if (props.sync) {
+      sync.checked = true;
+      textarea.value = (
+        (await browser.storage.sync.get(props.key)) as { [key: string]: string }
+      )[props.key];
+      size.innerText = `${await browser.storage.sync.getBytesInUse(
+        props.key
+      )} B`;
+    } else {
+      textarea.value = (
+        (await browser.storage.local.get(props.key)) as {
+          [key: string]: string;
+        }
+      )[props.key];
+      size.innerText = `~${new Blob([textarea.value.valueOf()]).size} B`;
+    }
     const fn = (nums: number[]) => {
       const m = mods.querySelectorAll("input");
       for (const i of nums) {
