@@ -67,10 +67,29 @@ const Row = (props: {
       0
     )}`;
   return (
-    <tr>
+    <tr id={props.key}>
       <td>
         {(props.key.length === 0 && (
-          <button type="button" id="submit">
+          <button
+            type="button"
+            onClick={async () => {
+              const key = getKey();
+              if (document.getElementById(key))
+                return alert("Hotkey are ready exists!");
+              const code = textarea.value;
+              if (sync.checked) {
+                const keys: string[] =
+                  (await browser.storage.sync.get("sync"))["sync"] || [];
+                keys.push(key);
+                browser.storage.sync.set({ [key]: code, sync: keys });
+              } else {
+                const keys: string[] =
+                  (await browser.storage.local.get("local"))["local"] || [];
+                keys.push(key);
+                browser.storage.local.set({ [key]: code, local: keys });
+              }
+            }}
+          >
             Add
           </button>
         )) || (
