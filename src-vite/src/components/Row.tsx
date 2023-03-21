@@ -4,6 +4,7 @@ import browser from "webextension-polyfill";
 const Row = (props: { key: string }) => {
   let textarea!: HTMLTextAreaElement;
   let size!: HTMLTableCellElement;
+  let mods!: HTMLTableCellElement;
   onMount(async () => {
     if (props.key) {
       textarea.value = (
@@ -12,6 +13,35 @@ const Row = (props: { key: string }) => {
       size.innerText = `${await browser.storage.sync.getBytesInUse(
         props.key
       )} B`;
+      const fn = (nums: number[]) => {
+        const m = mods.querySelectorAll("input");
+        for (const i of nums) {
+          m[i].checked = true;
+        }
+      };
+      switch (props.key.charAt(props.key.length - 1)) {
+        case "1":
+          fn([0]);
+          break;
+        case "2":
+          fn([1]);
+          break;
+        case "3":
+          fn([0, 1]);
+          break;
+        case "4":
+          fn([2]);
+          break;
+        case "5":
+          fn([0, 2]);
+          break;
+        case "6":
+          fn([1, 2]);
+          break;
+        case "7":
+          fn([0, 1, 2]);
+          break;
+      }
     }
   });
   return (
@@ -80,7 +110,7 @@ const Row = (props: { key: string }) => {
           <option value="F12">F12</option>
         </select>
       </td>
-      <td class="mods">
+      <td ref={mods}>
         <div>
           <input type="checkbox" autocomplete="off" />
           Shift
