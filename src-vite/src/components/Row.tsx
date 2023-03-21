@@ -6,42 +6,39 @@ const Row = (props: { key: string }) => {
   let size!: HTMLTableCellElement;
   let mods!: HTMLTableCellElement;
   onMount(async () => {
-    if (props.key) {
-      textarea.value = (
-        (await browser.storage.sync.get(props.key)) as { [key: string]: string }
-      )[props.key];
-      size.innerText = `${await browser.storage.sync.getBytesInUse(
-        props.key
-      )} B`;
-      const fn = (nums: number[]) => {
-        const m = mods.querySelectorAll("input");
-        for (const i of nums) {
-          m[i].checked = true;
-        }
-      };
-      switch (props.key.charAt(props.key.length - 1)) {
-        case "1":
-          fn([0]);
-          break;
-        case "2":
-          fn([1]);
-          break;
-        case "3":
-          fn([0, 1]);
-          break;
-        case "4":
-          fn([2]);
-          break;
-        case "5":
-          fn([0, 2]);
-          break;
-        case "6":
-          fn([1, 2]);
-          break;
-        case "7":
-          fn([0, 1, 2]);
-          break;
+    if (!props.key) return;
+    textarea.value = (
+      (await browser.storage.sync.get(props.key)) as { [key: string]: string }
+    )[props.key];
+    size.innerText = `${await browser.storage.sync.getBytesInUse(props.key)} B`;
+    const fn = (nums: number[]) => {
+      const m = mods.querySelectorAll("input");
+      for (const i of nums) {
+        m[i].checked = true;
       }
+    };
+    switch (props.key.charAt(props.key.length - 1)) {
+      case "1":
+        fn([0]);
+        break;
+      case "2":
+        fn([1]);
+        break;
+      case "3":
+        fn([0, 1]);
+        break;
+      case "4":
+        fn([2]);
+        break;
+      case "5":
+        fn([0, 2]);
+        break;
+      case "6":
+        fn([1, 2]);
+        break;
+      case "7":
+        fn([0, 1, 2]);
+        break;
     }
   });
   return (
