@@ -34,10 +34,10 @@ const App: Component = () => {
               <th>Size</th>
               <th>Script</th>
             </tr>
-            <Row key="" />
+            <Row key="" sync={false} />
           </thead>
           <tbody>
-            <For each={sync()}>{(key) => <Row key={key} />}</For>
+            <For each={sync()}>{(key) => <Row key={key} sync={true} />}</For>
           </tbody>
         </table>
       </div>

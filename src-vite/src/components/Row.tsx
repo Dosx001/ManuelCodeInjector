@@ -1,14 +1,16 @@
 import { onMount } from "solid-js";
 import browser from "webextension-polyfill";
 
-const Row = (props: { key: string }) => {
+const Row = (props: { key: string; sync: boolean }) => {
   let key!: HTMLSelectElement;
   let mods!: HTMLTableCellElement;
+  let sync!: HTMLInputElement;
   let size!: HTMLTableCellElement;
   let textarea!: HTMLTextAreaElement;
   onMount(async () => {
     if (!props.key) return;
     key.value = props.key.substring(0, props.key.length - 1);
+    if (props.sync) sync.checked = true;
     textarea.value = (
       (await browser.storage.sync.get(props.key)) as { [key: string]: string }
     )[props.key];
@@ -124,7 +126,7 @@ const Row = (props: { key: string }) => {
         </div>
       </td>
       <td>
-        <input class="sync" type="checkbox" autocomplete="off" />
+        <input ref={sync} type="checkbox" autocomplete="off" />
       </td>
       <td ref={size}>-</td>
       <td>
