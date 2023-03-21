@@ -66,6 +66,9 @@ const Row = (props: {
       (sum, el, i) => (el.checked ? (i === 2 ? sum + 4 : sum + i + 1) : sum),
       0
     )}`;
+  const disable = () => {
+    if (props.key !== "") sync.disabled = true;
+  };
   return (
     <tr id={props.key}>
       <td>
@@ -116,6 +119,7 @@ const Row = (props: {
                     if (props.key !== key)
                       browser.storage.local.remove(props.key);
                   }
+                  sync.disabled = false;
                 }}
               >
                 Save
@@ -138,7 +142,7 @@ const Row = (props: {
           )}
       </td>
       <td>
-        <select ref={key} autocomplete="off">
+        <select ref={key} autocomplete="off" onChange={disable}>
           <option value="A">A</option>
           <option value="B">B</option>
           <option value="C">C</option>
@@ -191,15 +195,15 @@ const Row = (props: {
       </td>
       <td ref={mods}>
         <div>
-          <input type="checkbox" autocomplete="off" />
+          <input type="checkbox" autocomplete="off" onChange={disable} />
           Shift
         </div>
         <div>
-          <input type="checkbox" autocomplete="off" />
+          <input type="checkbox" autocomplete="off" onChange={disable} />
           Ctrl
         </div>
         <div>
-          <input type="checkbox" autocomplete="off" />
+          <input type="checkbox" autocomplete="off" onChange={disable} />
           Alt
         </div>
       </td>
@@ -215,6 +219,7 @@ const Row = (props: {
           placeholder="Type code here"
           autocomplete="off"
           spellcheck={false}
+          onInput={disable}
         />
       </td>
     </tr>
