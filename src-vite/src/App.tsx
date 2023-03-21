@@ -36,13 +36,19 @@ const App: Component = () => {
               <th>Size</th>
               <th>Script</th>
             </tr>
-            <Row key="" sync={false} />
+            <Row key="" sync={false} get={null} set={null} />
           </thead>
           <tbody>
-            <For each={local()}>{(key) => <Row key={key} sync={false} />}</For>
+            <For each={local()}>
+              {(key) => (
+                <Row key={key} sync={false} get={local} set={setLocal} />
+              )}
+            </For>
           </tbody>
           <tfoot>
-            <For each={sync()}>{(key) => <Row key={key} sync={true} />}</For>
+            <For each={sync()}>
+              {(key) => <Row key={key} sync={true} get={sync} set={setSync} />}
+            </For>
           </tfoot>
         </table>
       </div>

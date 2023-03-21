@@ -1,7 +1,12 @@
-import { onMount } from "solid-js";
+import { Accessor, onMount, Setter } from "solid-js";
 import browser from "webextension-polyfill";
 
-const Row = (props: { key: string; sync: boolean }) => {
+const Row = (props: {
+  key: string;
+  sync: boolean;
+  get: Accessor<string[]> | null;
+  set: Setter<string[]> | null;
+}) => {
   let key!: HTMLSelectElement;
   let mods!: HTMLTableCellElement;
   let sync!: HTMLInputElement;
