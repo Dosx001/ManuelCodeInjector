@@ -22,7 +22,13 @@ const App: Component = () => {
   return (
     <>
       <div>Remaining online storage: {bytes()}</div>
-      <div class="scroll">
+      <div
+        class="mt-1 max-h-[93vh] overflow-auto border-[gray]"
+        style={{
+          "border-top": "2px solid gray",
+          "border-bottom": "2px solid gray",
+        }}
+      >
         <table>
           <thead>
             <tr>
@@ -30,9 +36,9 @@ const App: Component = () => {
               <th>Key</th>
               <th>Modifier</th>
               <th>
-                Sync
+                Sync{" "}
                 <span
-                  class="bubble"
+                  class="border-X cursor-help rounded-full bg-[darkgray] text-black"
                   title="Check to sync hotkey to your Firefox account, limited space is available. If not, hotkey is saved to your local machine."
                 >
                   ?

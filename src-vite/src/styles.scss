@@ -3,10 +3,17 @@
 @tailwind utilities;
 @import "../../src/base.scss";
 @layer base {
+  button {
+    @apply h-8 cursor-pointer rounded-md border-2 border-[gray] bg-black text-base text-[darkgray];
+  }
 }
 @layer components {
 }
 @layer utilities {
+}
+.border-X {
+  border-left: 7px solid darkgray;
+  border-right: 7px solid darkgray;
 }
 thead {
   background: #181a1b;
@@ -34,15 +41,6 @@ table {
     text-align: left;
   }
 }
-button {
-  background: black;
-  border-radius: 10%;
-  border: 2px solid gray;
-  color: darkgray;
-  cursor: pointer;
-  font-size: 1rem;
-  height: 2rem;
-}
 textarea {
   background: black;
   border: 1px solid #484848;
@@ -59,18 +57,4 @@ select {
   border: 1px solid #484848;
   color: darkgray;
   cursor: pointer;
-}
-.bubble {
-  background: darkgray;
-  border-left: 7px solid darkgray;
-  border-radius: 50%;
-  border-right: 8px solid darkgray;
-  color: black;
-  cursor: help;
-}
-.scroll {
-  border-bottom: 2px solid gray;
-  border-top: 2px solid gray;
-  max-height: 93vh;
-  overflow: auto;
 }
