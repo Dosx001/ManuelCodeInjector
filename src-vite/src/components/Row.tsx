@@ -10,25 +10,25 @@ const Row = (props: {
   let mods!: HTMLTableCellElement;
   let sync!: HTMLInputElement;
   let size!: HTMLTableCellElement;
-  let textarea!: HTMLTextAreaElement;
+  let code!: HTMLTextAreaElement;
   onMount(async () => {
     if (!props.key) return;
     key.value = props.key.substring(0, props.key.length - 1);
     if (props.sync) {
       sync.checked = true;
-      textarea.value = (
+      code.value = (
         (await browser.storage.sync.get(props.key)) as { [key: string]: string }
       )[props.key];
       size.innerText = `${await browser.storage.sync.getBytesInUse(
         props.key
       )} B`;
     } else {
-      textarea.value = (
+      code.value = (
         (await browser.storage.local.get(props.key)) as {
           [key: string]: string;
         }
       )[props.key];
-      size.innerText = `~${new Blob([textarea.value.valueOf()]).size} B`;
+      size.innerText = `~${new Blob([code.value.valueOf()]).size} B`;
     }
     const fn = (nums: number[]) => {
       const m = mods.querySelectorAll("input");
@@ -60,7 +60,7 @@ const Row = (props: {
         break;
     }
   });
-  const getKey = () =>
+  const getModKey = () =>
     `${key.value}${Array.from(mods.querySelectorAll("input")).reduce(
       (sum, el, i) => (el.checked ? (i === 2 ? sum + 4 : sum + i + 1) : sum),
       0
@@ -77,21 +77,28 @@ const Row = (props: {
             <button
               type="button"
               onClick={async () => {
-                const key = getKey();
-                if (document.getElementById(key))
+                const mkey = getModKey();
+                if (document.getElementById(mkey))
                   return alert("Hotkey are ready exists!");
-                const code = textarea.value;
+                const txt = code.value;
                 if (sync.checked) {
                   const keys: string[] =
                     (await browser.storage.sync.get("sync"))["sync"] || [];
-                  keys.push(key);
-                  browser.storage.sync.set({ [key]: code, sync: keys });
+                  keys.push(mkey);
+                  browser.storage.sync.set({ [mkey]: txt, sync: keys });
                 } else {
                   const keys: string[] =
                     (await browser.storage.local.get("local"))["local"] || [];
-                  keys.push(key);
-                  browser.storage.local.set({ [key]: code, local: keys });
+                  keys.push(mkey);
+                  browser.storage.local.set({ [mkey]: txt, local: keys });
                 }
+                key.value = "A";
+                mods
+                  .querySelectorAll("input")
+                  .forEach((e) => (e.checked = false));
+                sync.checked = false;
+                size.innerText = "-";
+                code.value = "";
               }}
             >
               Add
@@ -101,23 +108,23 @@ const Row = (props: {
           <button
             class="mb-2"
             onClick={() => {
-              const key = getKey();
-              if (props.key !== key && document.getElementById(key))
+              const mkey = getModKey();
+              if (props.key !== mkey && document.getElementById(mkey))
                 return alert("Hotkey are ready exists!");
               props.get!()[props.get!().findIndex((id) => id === props.key)] =
-                key;
+                mkey;
               if (sync.checked) {
                 browser.storage.sync.set({
-                  [key]: textarea.value,
+                  [mkey]: code.value,
                   sync: props.get!(),
                 });
-                if (props.key !== key) browser.storage.sync.remove(props.key);
+                if (props.key !== mkey) browser.storage.sync.remove(props.key);
               } else {
                 browser.storage.local.set({
-                  [key]: textarea.value,
+                  [mkey]: code.value,
                   local: props.get!(),
                 });
-                if (props.key !== key) browser.storage.local.remove(props.key);
+                if (props.key !== mkey) browser.storage.local.remove(props.key);
               }
               sync.disabled = false;
             }}
@@ -219,7 +226,7 @@ const Row = (props: {
                 (await browser.storage.local.get("local"))["local"] || [];
               keys.push(props.key);
               browser.storage.local.set({
-                [props.key]: textarea.value,
+                [props.key]: code.value,
                 local: keys,
               });
               browser.storage.sync.set({ sync: filter });
@@ -229,7 +236,7 @@ const Row = (props: {
                 (await browser.storage.sync.get("sync"))["sync"] || [];
               keys.push(props.key);
               browser.storage.sync.set({
-                [props.key]: textarea.value,
+                [props.key]: code.value,
                 sync: keys,
               });
               browser.storage.local.set({ local: filter });
@@ -241,7 +248,7 @@ const Row = (props: {
       <td ref={size}>-</td>
       <td>
         <textarea
-          ref={textarea}
+          ref={code}
           cols="40"
           rows="5"
           placeholder="Type code here"
@@ -249,7 +256,7 @@ const Row = (props: {
           spellcheck={false}
           onInput={() => {
             disable();
-            size.innerText = `~${new Blob([textarea.value]).size + 4} B`;
+            size.innerText = `~${new Blob([code.value]).size + 4} B`;
           }}
         />
       </td>
