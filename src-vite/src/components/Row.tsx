@@ -207,7 +207,36 @@ const Row = (props: {
         </div>
       </td>
       <td>
-        <input ref={sync} type="checkbox" autocomplete="off" />
+        <input
+          ref={sync}
+          type="checkbox"
+          autocomplete="off"
+          onInput={async () => {
+            if (props.key === "") return;
+            const filter = props.get!().filter((id) => id !== props.key);
+            if (props.sync) {
+              const keys: string[] =
+                (await browser.storage.local.get("local"))["local"] || [];
+              keys.push(props.key);
+              browser.storage.local.set({
+                [props.key]: textarea.value,
+                local: keys,
+              });
+              browser.storage.sync.set({ sync: filter });
+              browser.storage.sync.remove(props.key);
+            } else {
+              const keys: string[] =
+                (await browser.storage.sync.get("sync"))["sync"] || [];
+              keys.push(props.key);
+              browser.storage.sync.set({
+                [props.key]: textarea.value,
+                sync: keys,
+              });
+              browser.storage.local.set({ local: filter });
+              browser.storage.local.remove(props.key);
+            }
+          }}
+        />
       </td>
       <td ref={size}>-</td>
       <td>
