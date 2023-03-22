@@ -24,4 +24,7 @@
 @layer components {
 }
 @layer utilities {
+  .hide {
+    @apply translate-y-[-9999px] duration-[0.01s];
+  }
 }

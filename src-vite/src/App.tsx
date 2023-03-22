@@ -2,6 +2,9 @@ import { Component, createSignal, For, onCleanup, onMount } from "solid-js";
 import Row from "./components/Row";
 import "./styles.scss";
 
+export const [drag, setDrag] = createSignal(0);
+export const [safe, setSafe] = createSignal(false);
+
 const App: Component = () => {
   const [bytes, setBytes] = createSignal("0 kB");
   const [sync, setSync] = createSignal<string[]>([]);
@@ -40,16 +43,32 @@ const App: Component = () => {
               <th>Size</th>
               <th>Script</th>
             </tr>
-            <Row key="" sync={false} get={null} />
+            <Row index={-1} key="" sync={false} get={null} set={null} />
           </thead>
           <tbody>
             <For each={local()}>
-              {(key) => <Row key={key} sync={false} get={local} />}
+              {(key, i) => (
+                <Row
+                  index={i()}
+                  key={key}
+                  sync={false}
+                  get={local}
+                  set={setLocal}
+                />
+              )}
             </For>
           </tbody>
           <tfoot>
             <For each={sync()}>
-              {(key) => <Row key={key} sync={true} get={sync} />}
+              {(key, i) => (
+                <Row
+                  index={i()}
+                  key={key}
+                  sync={true}
+                  get={sync}
+                  set={setSync}
+                />
+              )}
             </For>
           </tfoot>
         </table>

@@ -1,9 +1,12 @@
-import { Accessor, onMount, Show } from "solid-js";
+import { Accessor, onMount, Setter, Show } from "solid-js";
+import { drag, safe, setDrag, setSafe } from "../App";
 
 const Row = (props: {
+  index: number;
   key: string;
   sync: boolean;
   get: Accessor<string[]> | null;
+  set: Setter<string[]> | null;
 }) => {
   let key!: HTMLSelectElement;
   let mods!: HTMLTableCellElement;
@@ -68,7 +71,31 @@ const Row = (props: {
     if (props.key !== "") sync.disabled = true;
   };
   return (
-    <tr id={props.key}>
+    <tr
+      id={props.key}
+      draggable={props.key !== ""}
+      style={{ cursor: props.key.length ? "grab" : "" }}
+      onDragStart={(ev) => {
+        setDrag(props.index);
+        setSafe(props.sync);
+        ev.currentTarget.classList.add("hide");
+      }}
+      onDragOver={() => {
+        if (props.index === -1 || props.sync !== safe()) return;
+        const keys = Array.from(props.get!());
+        const i = props.index;
+        const dg = drag();
+        setDrag(i);
+        [keys[i], keys[dg]] = [keys[dg]!, keys[i]!];
+        props.set!(keys);
+      }}
+      onDragEnd={(ev) => {
+        ev.currentTarget.classList.remove("hide");
+        props.sync
+          ? browser.storage.sync.set({ sync: props.get!() })
+          : browser.storage.local.set({ local: props.get!() });
+      }}
+    >
       <td class="w-16 text-center">
         <Show
           when={props.get}
