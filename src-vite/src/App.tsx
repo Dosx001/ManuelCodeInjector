@@ -23,7 +23,7 @@ const App: Component = () => {
       <div>Remaining online storage: {bytes()}</div>
       <div class="mt-1 max-h-[93vh] overflow-auto border-y-2 border-[gray]">
         <table class="w-full border-separate border-spacing-0 border-l-2 border-[gray] bg-[#181a1b]">
-          <thead>
+          <thead class="sticky top-0 bg-[#181a1b]">
             <tr>
               <th>Actions</th>
               <th>Key</th>

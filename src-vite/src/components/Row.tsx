@@ -69,7 +69,7 @@ const Row = (props: {
   };
   return (
     <tr id={props.key}>
-      <td>
+      <td class="w-16 text-center">
         <Show
           when={props.get}
           fallback={
@@ -146,8 +146,13 @@ const Row = (props: {
           </button>
         </Show>
       </td>
-      <td>
-        <select ref={key} autocomplete="off" onChange={disable}>
+      <td class="w-16 text-center">
+        <select
+          ref={key}
+          autocomplete="off"
+          class="cursor-pointer rounded border border-[#484848] bg-black text-[darkgray]"
+          onChange={disable}
+        >
           <option value="A">A</option>
           <option value="B">B</option>
           <option value="C">C</option>
@@ -198,7 +203,7 @@ const Row = (props: {
           <option value="F12">F12</option>
         </select>
       </td>
-      <td ref={mods}>
+      <td ref={mods} class="w-16 text-left">
         <div>
           <input type="checkbox" autocomplete="off" onChange={disable} />
           Shift
@@ -212,7 +217,7 @@ const Row = (props: {
           Alt
         </div>
       </td>
-      <td>
+      <td class="w-16 text-center">
         <input
           ref={sync}
           type="checkbox"
@@ -244,7 +249,9 @@ const Row = (props: {
           }}
         />
       </td>
-      <td ref={size}>-</td>
+      <td ref={size} class="w-16 text-center">
+        -
+      </td>
       <td>
         <textarea
           ref={code}
@@ -253,6 +260,7 @@ const Row = (props: {
           placeholder="Type code here"
           autocomplete="off"
           spellcheck={false}
+          class="w-[99%] border border-[#484848] bg-black text-[darkgray] "
           onInput={() => {
             disable();
             size.innerText = `~${new Blob([code.value]).size + 4} B`;

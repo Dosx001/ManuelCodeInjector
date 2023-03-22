@@ -7,52 +7,21 @@
 ::after {
   border-width: 0;
   border-style: solid;
-  border-color: theme("borderColor.DEFAULT", currentColor);
+  border-color: theme("borderColor.DEFAULT");
 }
 @layer base {
   button {
     @apply h-8 cursor-pointer rounded-md border-2 border-[gray] bg-black text-base text-[darkgray];
   }
+  input {
+    @apply cursor-pointer;
+  }
+  th,
+  td {
+    @apply border-r-2 border-b-2 border-[gray];
+  }
 }
 @layer components {
 }
 @layer utilities {
-}
-thead {
-  background: #181a1b;
-  position: sticky;
-  top: 0;
-}
-table {
-  th,
-  td {
-    border-bottom: 2px solid gray;
-    border-right: 2px solid gray;
-  }
-  th:nth-child(-n + 5) {
-    width: 4rem;
-  }
-  td:nth-child(-n + 5) {
-    text-align: center;
-  }
-  td:nth-child(3) {
-    text-align: left;
-  }
-}
-textarea {
-  background: black;
-  border: 1px solid #484848;
-  color: darkgray;
-  width: 99%;
-}
-input,
-option {
-  cursor: pointer;
-}
-select {
-  background: black;
-  border-radius: 1%;
-  border: 1px solid #484848;
-  color: darkgray;
-  cursor: pointer;
 }
