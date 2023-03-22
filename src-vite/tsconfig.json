@@ -4,7 +4,6 @@
     "lib": ["esnext", "dom", "dom.iterable"],
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "types": ["vite/client"],
     "module": "commonjs",
     "rootDir": "./src",
     "esModuleInterop": true,

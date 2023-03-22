@@ -1,5 +1,4 @@
 import { Component, createSignal, For, onCleanup, onMount } from "solid-js";
-import browser from "webextension-polyfill";
 import Row from "./components/Row";
 import "./styles.scss";
 

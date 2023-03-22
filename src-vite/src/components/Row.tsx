@@ -1,5 +1,4 @@
 import { Accessor, onMount, Show } from "solid-js";
-import browser from "webextension-polyfill";
 
 const Row = (props: {
   key: string;

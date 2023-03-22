@@ -1,4 +1,7 @@
 {
+  "globals": {
+    "browser": "readonly"
+  },
   "overrides": [
     {
       "files": ["*.ts", "*.tsx"],
