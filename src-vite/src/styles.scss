@@ -10,6 +10,9 @@
   border-color: theme("borderColor.DEFAULT");
 }
 @layer base {
+  #root {
+    @apply mx-auto w-full max-w-[1536px];
+  }
   button {
     @apply h-8 cursor-pointer rounded-md border-2 border-[gray] bg-black text-base text-[darkgray];
   }
