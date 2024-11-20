@@ -5,5 +5,3 @@
 *.css
 *.css.map
 *.tar.gz
-yarn-debug.log*
-yarn-error.log*
