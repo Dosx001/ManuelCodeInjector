@@ -8,10 +8,10 @@
     "tar": "tar --exclude={'src-vite/node_modules','dist/assets'} -czvf ManuelCodeInjector.tar.gz src src-vite dist build.sh package.json tsconfig.json yarn.lock README_FIREFOX.md"
   },
   "devDependencies": {
-    "@types/firefox-webext-browser": "^111.0.1",
-    "@typescript-eslint/eslint-plugin": "^6.2.0",
-    "@typescript-eslint/parser": "^6.2.0",
-    "eslint": "^8.45.0",
-    "typescript": "^5.1.6"
+    "@types/firefox-webext-browser": "^111.0.5",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.57.1",
+    "typescript": "^5.6.3"
   }
 }
