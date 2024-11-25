@@ -1,7 +1,4 @@
+/dist
 /node_modules
 /web-ext-artifacts
-/dist/index.html
-*.js
-*.css
-*.css.map
 *.tar.gz

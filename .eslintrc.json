@@ -1,15 +1,18 @@
 {
+  "globals": {
+    "browser": "readonly"
+  },
   "env": {
     "browser": true,
     "commonjs": true,
     "es2021": true
   },
-  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": "latest"
   },
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["solid"],
+  "extends": ["eslint:recommended", "plugin:solid/recommended"],
   "rules": {
     "@typescript-eslint/no-non-null-assertion": "off"
   }

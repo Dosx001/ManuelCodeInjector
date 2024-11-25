@@ -11,7 +11,7 @@ const App: Component = () => {
   const [local, setLocal] = createSignal<string[]>([]);
   const handle = async () => {
     setBytes(
-      `${(102400 - (await browser.storage.sync.getBytesInUse())) / 1000} kB`
+      `${(102400 - (await browser.storage.sync.getBytesInUse())) / 1000} kB`,
     );
     setLocal((await browser.storage.local.get("local"))["local"] as string[]);
     setSync((await browser.storage.sync.get("sync"))["sync"] as string[]);
