@@ -9,7 +9,10 @@
   ],
   "browser_specific_settings": {
     "gecko": {
-      "id": "@manualcodeinjector"
+      "id": "@manualcodeinjector",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
     }
   },
   "icons": {
