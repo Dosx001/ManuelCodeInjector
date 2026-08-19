@@ -23,7 +23,7 @@ const Row = (props: {
         (await browser.storage.sync.get(props.key)) as { [key: string]: string }
       )[props.key];
       size.innerText = `${await browser.storage.sync.getBytesInUse(
-        props.key
+        props.key,
       )} B`;
     } else {
       code.value = (
@@ -66,7 +66,7 @@ const Row = (props: {
   const getModKey = () =>
     `${key.value}${Array.from(mods.querySelectorAll("input")).reduce(
       (sum, el, i) => (el.checked ? (i === 2 ? sum + 4 : sum + i + 1) : sum),
-      0
+      0,
     )}`;
   const disable = () => {
     if (props.key !== "") sync.disabled = true;
@@ -111,12 +111,12 @@ const Row = (props: {
                 if (sync.checked) {
                   const keys: string[] =
                     (await browser.storage.sync.get("sync"))["sync"] || [];
-                  keys.push(mkey);
+                  keys.unshift(mkey);
                   browser.storage.sync.set({ [mkey]: txt, sync: keys });
                 } else {
                   const keys: string[] =
                     (await browser.storage.local.get("local"))["local"] || [];
-                  keys.push(mkey);
+                  keys.unshift(mkey);
                   browser.storage.local.set({ [mkey]: txt, local: keys });
                 }
                 key.value = "A";
@@ -209,7 +209,7 @@ const Row = (props: {
             if (props.sync) {
               const keys: string[] =
                 (await browser.storage.local.get("local"))["local"] || [];
-              keys.push(props.key);
+              keys.unshift(props.key);
               browser.storage.local.set({
                 [props.key]: code.value,
                 local: keys,
@@ -219,7 +219,7 @@ const Row = (props: {
             } else {
               const keys: string[] =
                 (await browser.storage.sync.get("sync"))["sync"] || [];
-              keys.push(props.key);
+              keys.unshift(props.key);
               browser.storage.sync.set({
                 [props.key]: code.value,
                 sync: keys,
@@ -241,7 +241,7 @@ const Row = (props: {
           placeholder="Type code here"
           autocomplete="off"
           spellcheck={false}
-          class="w-[99%] border border-[#484848] bg-black text-[darkgray] "
+          class="w-[99%] border border-[#484848] bg-black text-[darkgray]"
           onInput={() => {
             disable();
             size.innerText = `~${new Blob([code.value]).size + 4} B`;
