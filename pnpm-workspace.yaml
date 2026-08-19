@@ -1,0 +1,5 @@
+allowBuilds:
+  '@parcel/watcher': true
+  dtrace-provider: true
+  esbuild: true
+  spawn-sync: true
