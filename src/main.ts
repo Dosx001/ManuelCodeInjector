@@ -5,7 +5,8 @@ document.addEventListener("keydown", (ev) => {
   if (ev.altKey) sum += 4;
   const key = ev.code;
   browser.runtime.sendMessage({
-    key: `${key.search("Key") + key.search("Digit") === -1 ? key.at(-1) : key
-      }${sum}`,
+    key: `${
+      key.search("Key") + key.search("Digit") === -1 ? key.at(-1) : key
+    }${sum}`,
   });
 });
