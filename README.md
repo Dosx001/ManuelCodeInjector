@@ -9,5 +9,6 @@ it across machine.
 ## UI
 
 ![popup](https://addons.mozilla.org/user-media/previews/full/276/276253.png)
-![preferences](https://addons.mozilla.org/user-media/previews/full/280/280262.png?modified=1679512786)
-![sorting](https://addons.mozilla.org/user-media/previews/full/280/280263.png?modified=1679512786)
+![settings sync](https://addons.mozilla.org/user-media/previews/full/400/400213.png)
+![settings local](https://addons.mozilla.org/user-media/previews/full/400/400214.png)
+![sorting](https://addons.mozilla.org/user-media/previews/full/400/400215.png)
